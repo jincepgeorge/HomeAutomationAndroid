@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+
+<head>
+    <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+            -->
+    <!--       <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *"> -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/angular-chart.min.css">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="css/jquery.toast.css">
+    <script src="js/vue.min.js" type="text/javascript"></script>
+    <script src="js/moment.min.js" type="text/javascript"></script>
+    <script src="js/core-min.js" type="text/javascript"></script>
+    <script src="js/hmac-min.js" type="text/javascript"></script>
+    <script src="js/sha256-min.js" type="text/javascript"></script>
+    <script src="js/mqttws31.js" type="text/javascript"></script>
+
+    <title>EY MTT IOT DEMO</title>
+</head>
+
+<body ng-app="app" ng-controller="LineCtrl" id="bodyCntrl">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+                <a class="navbar-brand" href="#">EY MTT IOT DEMO</a>
+            </div>
+            <div class="collapse navbar-collapse" id="myNavbar">
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#" ng-click="showDeviceParams();"><span class="glyphicon glyphicon-off"></span> Show Device Settings</a></li>
+                    <li><a href="#" ng-click="refreshClick();"><span class="glyphicon glyphicon-refresh"></span> Refresh</a></li>
+                    <li><a href="#" data-toggle="modal" data-target="#myModal"><span class="glyphicon glyphicon-wrench"></span> Settings</a></li>
+                    <li><a href="#" ng-click="setTriggerPoint();" data-toggle="modal"><span class="glyphicon glyphicon-wrench"></span> Set trigger Point</a></li>
+                   
+                    
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!--/HEADER -->
+    <section id="page">
+        <div id="main-content">
+
+            <div class="container">
+      
+
+
+                <div class="box solid grey">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            
+                            <div class="box border inverse">
+                                          <div>
+  <div>
+    <div>
+      <h4 class="panel-title">
+        <a data-toggle="collapse" href="#collapse1"><div class="box-title">
+                                    <h4><i class="fa fa-bell"></i>Room Temperarute</h4>
+                                    <div class="tools hidden-xs">
+                                        <span class="badge badge-green" id="last_update"></span>&nbsp;&nbsp;&nbsp;
+
+                                        <a href="javascript:void(0)" class="refresh" ng-click="refreshClick();">
+                                            <i class="fa fa-refresh"></i>
+                                        </a>
+                                        </div>
+                                </div></a>
+      </h4>
+    </div>
+    <div id="collapse1" class="panel-collapse collapse in">
+           
+                                <div class="box-body">
+                                    <div>
+                                        <div class="box-body font-400" style="padding-top: 0px;">
+                                           
+                                            <h4><i class="fa fa-fire"></i> Climate Temperature: <div id="nowClimateTemp" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>
+                                       
+                                            <!--                                            <h4><i class="fa fa-laptop"></i> Device Memory Free: <div id="nowPiMemoryFree" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>-->
+                                            <div id="deviceParams">
+
+                                            <h4><i class="fa fa-laptop"></i> Device Memory Usage: <div id="nowPiMemoryUsage" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>
+                                            <h4><i class="fa fa-laptop"></i> Device CPU Usage: <div id="nowPiCpuUsage" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>
+
+                                            <!-- <h4><i class="fa fa-fire"></i> Temperature: <div id="nowTemp" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>
+                                        <h4><i class="fa fa-cloud"></i> Fan Speed: <div id="nowHumidity" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>
+                                        <h4><i class="fa fa-flag"></i> Ac Voltage: <div id="nowWind" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4> -->
+                                            <h4><i class="fa fa-fire"></i> Ac power: <div id="nowAcPower" style="text-align: right; width: 170px; height: 40px; float: right">ON</div></h4>
+                                            <h4><i class="fa fa-fire"></i> Fan Status:<div id="nowAcFanStatus" style="text-align: right; width: 170px; height: 40px; float: right">ON</div></h4></h4>
+                                            <h4><i class="fa fa-fire"></i> Swing Status: <div id="nowSwingStatus" style="text-align: right; width: 170px; height: 40px; float: right">ON</div></h4></h4>
+                                             <h4><i class="fa fa-laptop"></i> Device Temperature: <div id="nowPiTemp" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>
+                                             </div>
+
+                                        </div>
+                                    </div>
+        <canvas id="line" class="chart chart-line" chart-data="tempData" chart-labels="tempLabels" chart-legend="true" chart-series="tempSeries" chart-colours="tempColor" chart-click="onClick">
+</canvas>
+
+                                </div>
+     
+    </div>
+  </div>
+</div>
+                        
+                            </div>
+                        </div>
+                <div class="col-md-6">
+                    <div class="box border inverse">
+                    
+<div>
+  <div>
+    <div>
+      <h4 class="panel-title">
+        <a data-toggle="collapse" href="#humidity"><div class="box-title">
+                                    <h4><i class="fa fa-cloud"></i>Relative humidity</h4>
+
+                                </div></a>
+      </h4>
+    </div>
+    <div id="humidity" class="panel-collapse collapse">
+         <div class="box-body">
+       <h4><i class="fa fa-cloud"></i> Climate Humidity: <div id="nowClimateHum" style="text-align: right; width: 170px; height: 40px; float: right; background: url(img/loaders/ajax-loader.gif) no-repeat 80% 50%; "></div></h4>
+         <canvas id="line" class="chart chart-line" chart-data="humData" chart-labels="humLabels" chart-legend="true" chart-series="humSeries" chart-colours="humColor" chart-click="onClick">
+</canvas>
+        
+       </div>
+    </div>
+  </div>
+    </div>
+</div>
+                         
+                        
+                        </div>
+                      
+                        
+                    </div>
+              
+                
+
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+
+    </section>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js" /></script>
+    <script type="text/javascript" src="js/angular.min.js" /></script>
+    <script src="js/aws-sdk-2.1.40.min.js"></script>
+    <script type="text/javascript" src="js/Chart.min.js" /></script>
+    <script src="js/angular-chart.js"></script>
+    <script type="text/javascript" src="js/awsDynamoService.js" /></script>
+    <script type="text/javascript" src="cordova.js"></script>
+    <script src="js/jquery.toast.js" type="text/javascript"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+
+
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Control Security Camera</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-primary" id="shutdown" ng-click="shutdown();"><span class="glyphicon glyphicon-off"></span> Shutdown</button>
+                        <button type="button" class="btn btn-primary" id="reboot" ng-click="reboot();"><span class="glyphicon glyphicon-off"></span> Reboot</button>
+
+
+                    </div>
+                     <p><h4> Home Camera </h4></p>
+                    <div class="btn-group btn-toggle">
+                       
+                        <button class="btn btn-default" ng-click="controLlights(1)">ON</button>
+                        <button class="btn btn-primary active" ng-click="controLlights(0)">OFF</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div id="triggerPintModel" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Set Trigger Point</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-inline" role="form">
+                        <div class="form-group">
+                            <label for="temperature">Temperature:</label>
+                            <input type="number" class="form-control" id="temperarure" ng-model="temperature">
+                                </div>
+                        <div class="form-group">
+                            <label for="pwd">Humidity:</label>
+                            <input type="number" class="form-control" ng-model="humidity" id="humidity">
+                                </div>
+                      
+                        <button type="submit" ng-click="submitTriggerValues()"  class="btn btn-default">Submit</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+</body>
+
+</html>

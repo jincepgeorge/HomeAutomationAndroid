@@ -1,0 +1,22 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "com.eyiotdemo.ui"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.eyiotdemo.ui"
+        },
+        "phonegap-plugin-push": {
+            "SENDER_ID": "736356302500",
+            "PACKAGE_NAME": "com.eyiotdemo.ui"
+        }
+    },
+    "dependent_plugins": {}
+}
